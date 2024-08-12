@@ -17,6 +17,7 @@ module.exports = {
       fontFamily: {
         heading: ["var(--font-heading)", ...fontFamily.sans],
         body: ["var(--font-body)", ...fontFamily.sans],
+        cursive: ["cursive"],
       },
       colors: {
         border: "hsl(var(--border))",
