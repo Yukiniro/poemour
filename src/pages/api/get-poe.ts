@@ -2,6 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const apiKey = process.env.DEEPSEEK_API_KEY;
+  const systemContent =
+    process.env.ASSISTANT_SYSTEM_CONTENT ||
+    "你是一个多才的情诗 AI，擅长写三行情诗，请你根据我给你的提示写一首三行情诗，不要超过 100 个字。";
 
   // 检查请求方法
   if (req.method === "POST") {
@@ -10,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const postData = JSON.stringify({
         messages: [
           {
-            content: "你是一个多才的情诗 AI，擅长写三行情诗，请你根据我给你的提示写一首三行情诗，不要超过 100 个字。",
+            content: systemContent,
             role: "system",
           },
           {
