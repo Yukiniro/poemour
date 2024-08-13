@@ -1,8 +1,3 @@
-# next-starter
+# Poemour
 
-## Introduce
-
-- [next.js](https://nextjs.org/)
-- [typescript](https://www.typescriptlang.org/)
-- [tailwindcss](https://tailwindcss.com/)
-- [shadcn-ui](https://ui.shadcn.com/)
+Poemour 是一个基于 DeepSeek API 根据关键词生成三行情书的网站。
