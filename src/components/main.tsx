@@ -4,29 +4,61 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRef, useState } from "react";
 import { Loading } from "./loading";
 import TypeIt from "typeit-react";
+import html2canvas from "html2canvas";
+import { saveAs } from "file-saver";
 
 export default function Component() {
   const [messages, setMessages] = useState<string[]>([]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLParagraphElement>(null);
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
     try {
       setLoading(true);
-      const text = textAreaRef.current!.value;
-      const response = await fetch("/api/get-poe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
-      });
-      const data = await response.json();
-      setMessages(data[0].split("\n"));
+      if (process.env.NEXT_PUBLIC_IS_LOCAL_HOST) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setMessages(["月光如水洒满窗，", "静谧夜空星辰藏，", "你是我心中最亮的星光。"]);
+      } else {
+        const text = textAreaRef.current!.value;
+        const response = await fetch("/api/get-poe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text }),
+        });
+        const data = await response.json();
+        setMessages(data[0].split("\n"));
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const handleExport = async () => {
+    if (contentRef.current) {
+      const { width, height } = contentRef.current.getBoundingClientRect();
+      const canvas = await html2canvas(contentRef.current, { width, height });
+      document.body.appendChild(canvas);
+      const blob = await new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error("Failed to create blob"));
+            }
+          },
+          "image/png",
+          1,
+        );
+      });
+      saveAs(blob as Blob, "poemour.png");
+    }
+  };
+
+  const showMessage = !loading && messages.length > 0;
 
   return (
     <div className="relative w-full bg-background text-foreground">
@@ -48,19 +80,29 @@ export default function Component() {
           >
             生成
           </Button>
-        </div>
-        <div className="prose prose-gray mx-auto dark:prose-invert text-2xl font-mono">
-          {loading ? (
-            <Loading />
-          ) : (
-            <TypeIt as="div" options={{ cursor: false }}>
-              {messages.map((message) => (
-                <p className="font-cursive text-4xl py-2" key={message}>
-                  {message}
-                </p>
-              ))}
-            </TypeIt>
-          )}
+          <div className="prose prose-gray dark:prose-invert text-2xl font-mono py-12">
+            {loading && (
+              <div className="py-12">
+                <Loading />
+              </div>
+            )}
+            {showMessage && (
+              <>
+                <div className="flex justify-center">
+                  <Button onClick={handleExport}>下载</Button>
+                </div>
+                <div ref={contentRef} className="text-[0px] leading-[0px] my-12">
+                  <TypeIt as="div" options={{ cursor: false }}>
+                    {messages.map((message) => (
+                      <p className="font-cursive text-4xl py-2" key={message}>
+                        {message}
+                      </p>
+                    ))}
+                  </TypeIt>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </main>
     </div>
