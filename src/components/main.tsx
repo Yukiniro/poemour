@@ -13,6 +13,8 @@ export default function Component() {
   const [fontFamily, setFontFamily] = useState<string>("cursive");
   const [fontSize, setFontSize] = useState<number>(36);
   const [lintHeight, setLineHeight] = useState<number>(40);
+  const [fontStyle, setFontStyle] = useState<string>("normal");
+  const [fontWeight, setFontWeight] = useState<string>("normal");
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLParagraphElement>(null);
   const [loading, setLoading] = useState(false);
@@ -65,14 +67,19 @@ export default function Component() {
   const { width, height } = useMemo(() => {
     let maxWidth = 0;
     let maxHeight = 0;
-    const fonts = `${fontSize}px ${fontFamily}`;
     messages.forEach((message: string) => {
-      const { width, height } = calcTextSize(null, message, fonts);
+      const { width, height } = calcTextSize(message, {
+        fontFamily,
+        fontSize: `${fontSize}px`,
+        lineHeight: `${lintHeight}px`,
+        fontStyle,
+        fontWeight,
+      });
       maxWidth = Math.max(maxWidth, width);
       maxHeight += height;
     });
     return { width: maxWidth, height: maxHeight };
-  }, [fontFamily, fontSize, messages]);
+  }, [fontFamily, fontSize, fontStyle, fontWeight, lintHeight, messages]);
   const messageStyle = useMemo(() => {
     return {
       fontFamily,
@@ -115,7 +122,7 @@ export default function Component() {
                 <div ref={contentRef} style={{ width, height }} className="text-[0px] leading-[0px] my-12 m-auto">
                   <TypeIt as="div" options={{ cursor: false }}>
                     {messages.map((message) => (
-                      <p className="py-2" style={messageStyle} key={message}>
+                      <p style={messageStyle} key={message}>
                         {message}
                       </p>
                     ))}
