@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Loading } from "./loading";
 import TypeIt from "typeit-react";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
+import { calcTextSize } from "@/util";
 
 export default function Component() {
   const [messages, setMessages] = useState<string[]>([]);
+  const [fontFamily, setFontFamily] = useState<string>("cursive");
+  const [fontSize, setFontSize] = useState<number>(36);
+  const [lintHeight, setLineHeight] = useState<number>(40);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const contentRef = useRef<HTMLParagraphElement>(null);
   const [loading, setLoading] = useState(false);
@@ -18,7 +22,7 @@ export default function Component() {
       setLoading(true);
       if (process.env.NEXT_PUBLIC_IS_LOCAL_HOST) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        setMessages(["月光如水洒满窗，", "静谧夜空星辰藏，", "你是我心中最亮的星光。"]);
+        setMessages(["月光如水洒满窗，", "静谧夜空星辰藏，", "一壶清酒醉斜阳。"]);
       } else {
         const text = textAreaRef.current!.value;
         const response = await fetch("/api/get-poe", {
@@ -38,9 +42,7 @@ export default function Component() {
 
   const handleExport = async () => {
     if (contentRef.current) {
-      const { width, height } = contentRef.current.getBoundingClientRect();
-      const canvas = await html2canvas(contentRef.current, { width, height });
-      document.body.appendChild(canvas);
+      const canvas = await html2canvas(contentRef.current);
       const blob = await new Promise((resolve, reject) => {
         canvas.toBlob(
           (blob) => {
@@ -59,6 +61,25 @@ export default function Component() {
   };
 
   const showMessage = !loading && messages.length > 0;
+
+  const { width, height } = useMemo(() => {
+    let maxWidth = 0;
+    let maxHeight = 0;
+    const fonts = `${fontSize}px ${fontFamily}`;
+    messages.forEach((message: string) => {
+      const { width, height } = calcTextSize(null, message, fonts);
+      maxWidth = Math.max(maxWidth, width);
+      maxHeight += height;
+    });
+    return { width: maxWidth, height: maxHeight };
+  }, [fontFamily, fontSize, messages]);
+  const messageStyle = useMemo(() => {
+    return {
+      fontFamily,
+      fontSize: `${fontSize}px`,
+      lineHeight: `${lintHeight}px`,
+    };
+  }, [fontFamily, fontSize, lintHeight]);
 
   return (
     <div className="relative w-full bg-background text-foreground">
@@ -91,10 +112,10 @@ export default function Component() {
                 <div className="flex justify-center">
                   <Button onClick={handleExport}>下载</Button>
                 </div>
-                <div ref={contentRef} className="text-[0px] leading-[0px] my-12">
+                <div ref={contentRef} style={{ width, height }} className="text-[0px] leading-[0px] my-12 m-auto">
                   <TypeIt as="div" options={{ cursor: false }}>
                     {messages.map((message) => (
-                      <p className="font-cursive text-4xl py-2" key={message}>
+                      <p className="py-2" style={messageStyle} key={message}>
                         {message}
                       </p>
                     ))}

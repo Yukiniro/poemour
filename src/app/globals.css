@@ -75,3 +75,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  img {
+    @apply inline-block;
+  }
+}
