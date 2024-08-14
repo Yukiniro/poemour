@@ -14,6 +14,8 @@
     "@yukiniro/react-github-corners": "^1.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.301.0",
     "next": "14.0.4",
     "react": "^18",
@@ -23,6 +25,7 @@
     "typeit-react": "^2.7.2"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
