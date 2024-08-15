@@ -4,7 +4,7 @@
   "description": "不管是处于热恋中的情侣，还是尚未表白的暗恋者，都能在 Poemour 这个网站上获得符合自己心境的三行情书。",
   "start_url": "poemour.vercel.app",
   "display": "standalone",
-  "keywords": "情书, 三行情书, 情诗, 情话, 情话网站, 情话生成器,",
+  "keywords": "情书, 三行情书, 情诗, 情话, 情话网站, 情话生成器, AI,",
   "title": "Poemour",
   "icons": [
     {
