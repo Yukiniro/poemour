@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: "Poemour",
     description: "生成你的专属三行情书",
     creator: "@Yukiro94317534",
-    images: ["/og-image.png"],
+    images: ["/twitter-image.png"],
   },
 };
 
